@@ -1,0 +1,75 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "CostCenter": {
+        "type": "string"
+      },
+      "ClusterSize": {
+        "type": "string",
+        "allowedValues": [
+          "Small",
+          "Medium",
+          "Large"
+        ]
+      },
+      "osType": {
+        "type": "string",
+        "allowedValues": [
+          "Windows",
+          "Linux"
+        ]
+      }
+    },
+    "variables": {
+      "agentPoolCount":{
+        "Small": 2,
+        "Medium": 4,
+        "Large": 8
+      },
+      "vmSize":{
+        "Small": "Standard_A1_v2",
+        "Medium": "Standard_A8_v2",
+        "Large": "Standard_A8m_v2"
+      }
+    },
+    "resources": [
+          {
+            "type": "Microsoft.ContainerService/managedClusters",
+            "apiVersion": "2017-08-31",
+            "name": "[toLower(concat(resourceGroup().name,'-akscluster'))]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+              "kubernetesVersion": "1.9",
+              "dnsPrefix": "[toLower(concat('cvs',resourceGroup().name,'-aks'))]",
+              "agentPoolProfiles": [
+                {
+                  "name": "agentpool",
+                  "count": "[variables('agentPoolCount')[parameters('ClusterSize')]]",
+                  "vmSize": "[variables('vmSize')[parameters('ClusterSize')]]",
+                  "osType": "[parameters('osType')]",
+                  "storageProfile": "ManagedDisks"
+                }
+              ],
+              "linuxProfile": {
+                "adminUsername": "adminUserName",
+                "ssh": {
+                  "publicKeys": [
+                    {
+                      "keyData": "keyData"
+                    }
+                  ]
+                }
+              },
+              "servicePrincipalProfile": {
+                "clientId": "client/app ID",
+                "keyVaultSecretRef":{
+                  "vaultID": "keyVault Resource ID",
+                  "secretName": "keyVault Secret Name"
+                }
+              }
+            }
+         }
+    ],
+    "outputs": {}
+}

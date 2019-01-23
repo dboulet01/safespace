@@ -1,0 +1,58 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "remotePeerVnet":{
+            "type": "object"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "apiVersion": "2015-01-01",
+            "type": "Microsoft.Resources/deployments",
+            "name": "updateVNet",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks','NetBond-VNET-EAST2')]",
+                "[parameters('remotePeerVnet').Id]"
+            ],
+            "properties": {
+              "mode": "Incremental",
+              "parameters": {},
+              "template": {
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                "contentVersion": "1.0.0.0",
+                "parameters": {},
+                "variables": {},
+                "resources": [
+                    {
+                        "apiVersion": "2016-03-30",
+                        "name": "firstVNet",
+                        "location":"[resourceGroup().location]",
+                        "type": "Microsoft.Network/virtualNetworks",
+                        "properties": {
+                            "addressSpace": "[reference('firstVNet').addressSpace]",
+                            "subnets":[
+                                {
+                                    "name":"[reference('firstVNet').subnets[0].name]",
+                                    "properties":{
+                                        "addressPrefix":"[reference('firstVNet').subnets[0].properties.addressPrefix]"
+                                        }
+                                },
+                                {
+                                    "name":"secondSubnet",
+                                    "properties":{
+                                        "addressPrefix":"10.0.1.0/24"
+                                        }
+                                }
+                           ]
+                        }
+                    }
+                ],
+                "outputs": {}
+                }
+              }
+          }
+    ],
+    "outputs": {}
+}

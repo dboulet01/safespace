@@ -1,0 +1,58 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "addressSpace": {
+            "type": "string"
+        },
+        "vnetName": {
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2018-08-01",
+            "name": "[parameters('vnetName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "[parameters('vnetName')]"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('addressSpace')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[concat(parameters('vnetName'),'-subnet')]",
+                        "properties":{
+                            "addressPrefix": "[parameters('addressSpace')]"
+                        }
+                    }
+                ],
+                "virtualNetworkPeerings":[
+                    {
+                        "name": "[concat(parameters('vnetName'),'-TO-NETBOND-EAST2')]",
+                        "properties":{
+                            "remoteAddressSpace":{
+                                "addressPrefixes":[
+                                    "10.243.46.0/24"
+                                ]
+                            },
+                            "remoteVirtualNetwork":{
+                                "id": "[resourceId('subscriptionID','SharedNetwork-USEAST2','Microsoft.Network/virtualNetworks','NetBond-VNET-EAST2')]"
+                            },
+                            "allowVirtualNetworkAccess":true,
+                            "allowForwardedTraffic":true,
+                            "useRemoteGateways":true
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {}
+}
