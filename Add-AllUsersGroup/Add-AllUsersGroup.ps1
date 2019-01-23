@@ -54,5 +54,3 @@ else {
 Remove-PSSession -Session $Session
 
 }
-
-Edit-AzureRmSiteRecoveryRecoveryPlan
