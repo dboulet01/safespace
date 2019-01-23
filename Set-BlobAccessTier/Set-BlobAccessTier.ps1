@@ -27,16 +27,16 @@ function Set-BlobAccessTier
             Write-Output "Creating Storage Context..."
 
     $context = New-AzureStorageContext `
-        -StorageAccountName $Using:storageaccountName `
-        -StorageAccountKey $Using:storageaccountKey
+        -StorageAccountName $storageaccountName `
+        -StorageAccountKey $storageaccountKey
         
             Write-Output "Done."
 
 	##Set access tier
 
-            Write-Output "Getting $Using:currentaccessTier  Tier Storage Blobs..."
+            Write-Output "Getting $($currentaccessTier)  Tier Storage Blobs..."
 
-    $blob = Get-AzureStorageBlob -Container $Using:containerName -Context $context | Where-Object{$_.icloudblob.properties.standardblobtier -eq $Using:currentaccessTier}
+    $blob = Get-AzureStorageBlob -Container $containerName -Context $context | Where-Object{$_.icloudblob.properties.standardblobtier -eq $currentaccessTier}
 
     	##Set tier of all the blobs to Archive
 
@@ -49,13 +49,13 @@ function Set-BlobAccessTier
 
                 Write-Output "Done."
 
-                Write-Output "Found $($blob.count) $using:currentaccessTier Blobs ..."
+                Write-Output "Found $($blob.count) $($currentaccessTier) Blobs ..."
 
-                Write-Output "Setting access tier to $Using:desiredaccessTier ..."
+                Write-Output "Setting access tier to $($desiredaccessTier) ..."
 
-                $blob.icloudblob.setstandardblobtier("$Using:desiredaccessTier")
+                $blob.icloudblob.setstandardblobtier("$($desiredaccessTier)")
 
-                Write-Output "Access tier set to $Using:desiredaccessTier ."
+                Write-Output "Access tier set to $($desiredaccessTier) ."
 
             }
 }
