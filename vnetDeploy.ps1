@@ -77,6 +77,7 @@ function New-AzureVnet {
             $paramObj = @{
                 vnetName = $hubVnetName
                 remoteVnetId = $resourceId
+                isHub = $true
             }
             Write-Host "Deploying peer configuration to $($hubVnetName)." -ForegroundColor Yellow
             New-AzResourceGroupDeployment -ResourceGroupName $hubVnetRG -TemplateParameterObject $paramObj -TemplateUri $PeeringTemplateUri -Verbose
