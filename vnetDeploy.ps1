@@ -18,7 +18,7 @@ function New-AzureVnet {
 
         #Enable Netbond Peer - Boolean Switch
         [switch]
-        $PeerToNetbond
+        $PeerToHub
 
     )
     
@@ -50,6 +50,7 @@ function New-AzureVnet {
         $PeeringTemplateUri = "https://raw.githubusercontent.com/dboulet01/safespace/master/vnetpeering.json"
         $paramObj = @{vnets = $VNetMetadata}
         $hubVnetId = "/subscriptions/779a66d5-d2b5-4c10-b8f3-1dc647a7f4a9/resourceGroups/TestHubVnet/providers/Microsoft.Network/virtualNetworks/TestHubVnet"
+        $hubVnetSubscription = $hubVnetId.Split('/')[2]
         $hubVnetRG = $hubVnetId.Split('/')[4]
         $hubVnetName = $hubVnetId.Split('/')[8]
 
@@ -71,7 +72,7 @@ function New-AzureVnet {
         $newVnet = Get-AzVirtualNetwork -ResourceGroupName $ResourceGroup -Name $VNetMetadata.name
         $resourceId = $newVnet.Id
 
-        if ($PeerToNetbond) {
+        if ($PeerToHub) {
             $spokeParamObj = @{
                 vnetName = $VNetMetadata.name
                 remoteVnetId = $hubVnetId
@@ -86,14 +87,31 @@ function New-AzureVnet {
                 remoteVnetId = $resourceId
                 isHub = $true
             }
+
+            Write-Host ""
+            Write-Host "Setting Hub Vnet subscription context." -ForegroundColor Yellow
+            Write-Host ""
+
+            Set-AzContext -Subscription $hubVnetSubscription
+
             Write-Host ""
             Write-Host "Deploying peer configuration to $($hubVnetName)." -ForegroundColor Yellow
             Write-Host ""
             $deployment = New-AzResourceGroupDeployment -ResourceGroupName $hubVnetRG -TemplateParameterObject $hubParamObj -TemplateUri $PeeringTemplateUri -Verbose
+            Write-Host ""
         }
     
     }
     
     end {
+        if ($PeerToHub) {
+            Write-Host ""
+            Write-Host "VNet has been created and peered to Hub." -ForegroundColor Green
+            Write-Host ""
+        }else{
+            Write-Host ""
+            Write-Host "Vnet has been created." -ForegroundColor Green
+            Write-Host ""
+        }
     }
 }

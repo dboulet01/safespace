@@ -37,10 +37,5 @@
             }
         }
     ],
-    "outputs": {
-        "resourceId": {
-            "type": "array",
-            "value": "[array(variables('resourceId'))]"
-        }
-    }
+    "outputs": {}
 }
