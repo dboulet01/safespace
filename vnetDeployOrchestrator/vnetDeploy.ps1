@@ -46,8 +46,8 @@ function New-AzureVnet {
             Get-AzContext
         }
 
-        $VnetTemplateUri = "https://raw.githubusercontent.com/dboulet01/safespace/master/vnet.json"
-        $PeeringTemplateUri = "https://raw.githubusercontent.com/dboulet01/safespace/master/vnetpeering.json"
+        $VnetTemplateUri = "https://raw.githubusercontent.com/dboulet01/safespace/master/ARM-Templates/vnet.json"
+        $PeeringTemplateUri = "https://raw.githubusercontent.com/dboulet01/safespace/master/ARM-Templates/vnetpeering.json"
         $hubVnetId = "/subscriptions/779a66d5-d2b5-4c10-b8f3-1dc647a7f4a9/resourceGroups/TestHubVnet/providers/Microsoft.Network/virtualNetworks/TestHubVnet"
         $hubVnetSubscription = $hubVnetId.Split('/')[2]
         $hubVnetRG = $hubVnetId.Split('/')[4]
