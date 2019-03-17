@@ -43,6 +43,7 @@ $arguments = @{
 #           - PS C:\Users\user\scripts>. .\vnetDeployMetadata.ps1                                                    #                                            
 #                                                                                                                    #
 #  4. Issue 'New-AzureVnet @arguments' to call function and splat parameters                                         #
+#                  (assumes you're logged in Azure 'Login-AzAccount')                                                #
 #                                                                                                                    #
 #  5. Popcorn                                                                                                        #
 #                                                                                                                    #
