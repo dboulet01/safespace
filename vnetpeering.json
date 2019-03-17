@@ -34,7 +34,7 @@
                 "allowVirtualNetworkAccess": true,
                 "allowForwardedTraffic": false,
                 "allowGatewayTransit": false,
-                "useRemoteGateways": true,
+                "useRemoteGateways": false,
                 "remoteVirtualNetwork": {
                     "id": "[parameters('remoteVnetId')]"
                 }

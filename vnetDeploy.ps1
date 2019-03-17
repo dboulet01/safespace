@@ -47,8 +47,8 @@ function New-AzureVnet {
         $PeeringTemplateUri = "https://raw.githubusercontent.com/dboulet01/safespace/master/vnetpeering.json"
         $paramObj = @{vnets = $VNetMetadata}
         $hubVnetId = "/subscriptions/779a66d5-d2b5-4c10-b8f3-1dc647a7f4a9/resourceGroups/TestHubVnet/providers/Microsoft.Network/virtualNetworks/TestHubVnet"
-        $hubVnetRG = "TestHubVnet"
-        $hubVnetName = "TestHubVnet"
+        $hubVnetRG = $hubVnetId.Split('/')[4]
+        $hubVnetName = $hubVnetId.Split('/')[8]
 
     }
     
@@ -65,6 +65,7 @@ function New-AzureVnet {
         $deployment = New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroup -TemplateParameterObject $paramObj -TemplateUri $VnetTemplateUri -Verbose
         $obj = ConvertTo-Json $deployment | ConvertFrom-Json
         $resourceId = $obj.Outputs.resourceId.Value.Split(' ')
+        $resourceId
 
         if ($PeerToNetbond) {
             $paramObj = @{
