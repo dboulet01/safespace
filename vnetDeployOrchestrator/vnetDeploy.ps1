@@ -31,38 +31,30 @@ function New-AzureVnet {
         $module = Get-Module Az* -ListAvailable
 
         if(!$module){
-
             Write-Host ""
             Write-Host "Az module not found.. Installing Az module." -ForegroundColor Yellow
 
             # Install module using PowerShellGet if not found
             Install-Module Az -AllowClobber -Force
-
         } 
         else {
-
             Write-Host ""
             Write-Host "Az module found." -ForegroundColor Green
-
         }
 
         Write-Host ""
         Write-Host "Setting Azure context." -ForegroundColor Yellow
 
         if($Subscription){
-
             # Set subscription context if subscription was provided
             Set-AzContext -Subscription $Subscription
-
         }
         else {
-
             Write-Host ""
             Write-Host "Subscription not provided - using current context." -ForegroundColor Yellow
 
             # Display current context to user as it was not declared
             Get-AzContext
-        
         }
 
         # Template Uris
@@ -79,7 +71,6 @@ function New-AzureVnet {
         $vnetParamObj = @{
             vnets = $VNetMetadata
         }
-
     }
     
     process {
@@ -111,12 +102,10 @@ function New-AzureVnet {
 
         # If PeerToHub is set to True
         if ($PeerToHub) {
-
             # Spoke peer deployment parameters
             $spokeParamObj = @{
                 vnetName = $VNetMetadata.name
                 remoteVnetId = $hubVnetId
-
             }
 
             Write-Host ""
@@ -161,18 +150,14 @@ function New-AzureVnet {
     
     end {
         if ($PeerToHub) {
-
             Write-Host ""
             Write-Host "VNet has been created and peered to Hub." -ForegroundColor Green
             Write-Host ""
-
         }
         else{
-
             Write-Host ""
             Write-Host "Vnet has been created." -ForegroundColor Green
             Write-Host ""
-
         }
     }
 }
