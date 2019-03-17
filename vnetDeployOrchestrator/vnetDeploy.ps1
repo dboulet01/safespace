@@ -6,17 +6,17 @@ function New-AzureVnet {
         [String]
         $Subscription,
 
-        #Resource Group
+        #Resource Group to deploy Vnet into
         [Parameter()]
         [String]
         $ResourceGroup,
 
-        #ARM Param Object
+        #Meta data object defining the Vnet to create
         [Parameter()]
         [array]
         $VNetMetadata,
 
-        #Enable Netbond Peer - Boolean Switch
+        #Enable Hub Peering - Boolean Switch
         [switch]
         $PeerToHub
 
@@ -48,7 +48,7 @@ function New-AzureVnet {
 
         $VnetTemplateUri = "https://raw.githubusercontent.com/dboulet01/safespace/master/ARM-Templates/vnet.json"
         $PeeringTemplateUri = "https://raw.githubusercontent.com/dboulet01/safespace/master/ARM-Templates/vnetpeering.json"
-        $hubVnetId = "/subscriptions/779a66d5-d2b5-4c10-b8f3-1dc647a7f4a9/resourceGroups/TestHubVnet/providers/Microsoft.Network/virtualNetworks/TestHubVnet"
+        $hubVnetId = "ENTER HUB RESOURCE ID HERE AFTER CREATION"
         $hubVnetSubscription = $hubVnetId.Split('/')[2]
         $hubVnetRG = $hubVnetId.Split('/')[4]
         $hubVnetName = $hubVnetId.Split('/')[8]
