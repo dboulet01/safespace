@@ -23,22 +23,25 @@ function New-AzureVnet {
     )
     
     begin {
-
+        Write-Host ""
         Write-Host "Checking if Az module is installed." -ForegroundColor Yellow
         $module = Get-Module Az* -ListAvailable
 
         if(!$module){
+            Write-Host ""
             Write-Host "Az module not found.. Installing Az module." -ForegroundColor Yellow
             Install-Module Az -AllowClobber -Force
         } else {
+            Write-Host ""
             Write-Host "Az module found." -ForegroundColor Green
         }
-
+        Write-Host ""
         Write-Host "Setting Azure context." -ForegroundColor Yellow
         if($Subscription){
             Set-AzContext -Subscription $Subscription
         }
         else {
+            Write-Host ""
             Write-Host "Subscription not provided - using current context." -ForegroundColor Yellow
             Get-AzContext
         }
@@ -56,32 +59,37 @@ function New-AzureVnet {
 
         $rgcheck = Get-AzResourceGroup -Name $ResourceGroup -ErrorAction SilentlyContinue
         if (!$rgcheck) {
+            Write-Host ""
             Write-Host "Resource Group does not exist." -ForegroundColor Red
             Write-Host "Creating resource group..." -ForegroundColor Yellow
             Write-Host "Please enter a location for new resource group $($ResourceGroup)." -ForegroundColor Yellow
+            Write-Host ""
             New-AzResourceGroup -Name $ResourceGroup
         }
 
         $deployment = New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroup -TemplateParameterObject $paramObj -TemplateUri $VnetTemplateUri -Verbose
-        $obj = ConvertTo-Json $deployment | ConvertFrom-Json
-        $resourceId = $obj.Outputs.resourceId.Value.Split(' ')
-        $resourceId
+        $newVnet = Get-AzVirtualNetwork -ResourceGroupName $ResourceGroup -Name $VNetMetadata.name
+        $resourceId = $newVnet.Id
 
         if ($PeerToNetbond) {
-            $paramObj = @{
+            $spokeParamObj = @{
                 vnetName = $VNetMetadata.name
                 remoteVnetId = $hubVnetId
             }
+            Write-Host ""
             Write-Host "Deploying peer configuration to $($VnetMetadata.name)." -ForegroundColor Yellow
-            New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroup -TemplateParameterObject $paramObj -TemplateUri $PeeringTemplateUri -Verbose
+            Write-Host ""
+            $deployment = New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroup -TemplateParameterObject $spokeParamObj -TemplateUri $PeeringTemplateUri -Verbose
 
-            $paramObj = @{
+            $hubParamObj = @{
                 vnetName = $hubVnetName
                 remoteVnetId = $resourceId
                 isHub = $true
             }
+            Write-Host ""
             Write-Host "Deploying peer configuration to $($hubVnetName)." -ForegroundColor Yellow
-            New-AzResourceGroupDeployment -ResourceGroupName $hubVnetRG -TemplateParameterObject $paramObj -TemplateUri $PeeringTemplateUri -Verbose
+            Write-Host ""
+            $deployment = New-AzResourceGroupDeployment -ResourceGroupName $hubVnetRG -TemplateParameterObject $hubParamObj -TemplateUri $PeeringTemplateUri -Verbose
         }
     
     }
