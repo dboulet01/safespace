@@ -40,7 +40,7 @@
     "outputs": {
         "resourceId": {
             "type": "array",
-            "value": "[string(variables('resourceId'))]"
+            "value": "[array(variables('resourceId'))]"
         }
     }
 }
