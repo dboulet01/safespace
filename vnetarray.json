@@ -12,10 +12,10 @@
     "variables": {
         "copy": [
             {
-                "name": "resourceIDs",
+                "name": "resourceId",
                 "count": "[length(parameters('vnets'))]",
-                "input": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnets')[copyIndex('resourceIDs')].Name)]",
-                "dependsOn": ["[parameters('vnets')[copyIndex('resourceIds')].Name]"]
+                "input": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnets')[copyIndex('resourceId')].Name)]",
+                "dependsOn": ["[parameters('vnets')[copyIndex('resourceId')].Name]"]
             }
         ]
     },
@@ -38,9 +38,9 @@
         }
     ],
     "outputs": {
-        "resourceIDs": {
-            "type": "string",
-            "value": "[variables('resourceIDs')]"
+        "resourceId": {
+            "type": "array",
+            "value": "[variables('resourceId')]"
         }
     }
 }
