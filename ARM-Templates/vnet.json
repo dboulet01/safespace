@@ -9,16 +9,7 @@
             }
         }
     },
-    "variables": {
-        "copy": [
-            {
-                "name": "resourceId",
-                "count": "[length(parameters('vnets'))]",
-                "input": "[resourceId('Microsoft.Network/virtualNetworks',parameters('vnets')[copyIndex('resourceId')].Name)]",
-                "dependsOn": ["[parameters('vnets')[copyIndex('resourceId')].Name]"]
-            }
-        ]
-    },
+    "variables": {},
     "resources": [
         {
             "type": "Microsoft.Network/virtualNetworks",
