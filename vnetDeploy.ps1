@@ -43,9 +43,12 @@ function New-AzureVnet {
             Get-AzContext
         }
 
-        $TemplateUri = "https://raw.githubusercontent.com/dboulet01/safespace/master/vnetarray.json"
+        $VnetTemplateUri = "https://raw.githubusercontent.com/dboulet01/safespace/master/vnetarray.json"
+        $PeeringTemplateUri = "https://raw.githubusercontent.com/dboulet01/safespace/master/vnetpeering.json"
         $paramObj = @{vnets = $VNetMetadata}
         $hubVnetId = "/subscriptions/779a66d5-d2b5-4c10-b8f3-1dc647a7f4a9/resourceGroups/TestHubVnet/providers/Microsoft.Network/virtualNetworks/TestHubVnet"
+        $hubVnetRG = "TestHubVnet"
+        $hubVnetName = "TestHubVnet"
 
     }
     
@@ -59,7 +62,7 @@ function New-AzureVnet {
             New-AzResourceGroup -Name $ResourceGroup
         }
 
-        $deployment = New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroup -TemplateParameterObject $paramObj -TemplateUri $TemplateUri -Verbose
+        $deployment = New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroup -TemplateParameterObject $paramObj -TemplateUri $VnetTemplateUri -Verbose
         $obj = ConvertTo-Json $deployment | ConvertFrom-Json
         $resourceId = $obj.Outputs.resourceId.Value.Split(' ')
 
@@ -68,12 +71,19 @@ function New-AzureVnet {
                 vnetName = $VNetMetadata.name
                 remoteVnetId = $hubVnetId
             }
-            New-Az
+            Write-Host "Deploying peer configuration to $($VnetMetadata.name)." -ForegroundColor Yellow
+            New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroup -TemplateParameterObject $paramObj -TemplateUri $PeeringTemplateUri -Verbose
+
+            $paramObj = @{
+                vnetName = $hubVnetName
+                remoteVnetId = $resourceId
+            }
+            Write-Host "Deploying peer configuration to $($hubVnetName)." -ForegroundColor Yellow
+            New-AzResourceGroupDeployment -ResourceGroupName $hubVnetRG -TemplateParameterObject $paramObj -TemplateUri $PeeringTemplateUri -Verbose
         }
     
     }
     
     end {
-        $resourceId
     }
 }
