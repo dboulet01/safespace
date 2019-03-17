@@ -9,7 +9,17 @@ function New-AzureVnet {
         #Resource Group
         [Parameter()]
         [String]
-        $ResourceGroup
+        $ResourceGroup,
+
+        #ARM Param Object
+        [Parameter()]
+        [System.Object]
+        $Param,
+
+        #Template Uri
+        [Parameter()]
+        [String]
+        $TemplateUri
 
     )
     
@@ -37,7 +47,7 @@ function New-AzureVnet {
     }
     
     process {
-        $deployment = New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroup -TemplateParameterObject $param -TemplateUri $TemplateUri -Verbose
+        $deployment = New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroup -TemplateParameterObject $Param -TemplateUri $TemplateUri -Verbose
         $obj = ConvertTo-Json $deployment | ConvertFrom-Json
         $resourceId = $obj.Outputs.resourceId.Value.Split(' ')
     }
