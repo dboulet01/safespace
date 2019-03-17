@@ -13,13 +13,12 @@ function New-AzureVnet {
 
         #ARM Param Object
         [Parameter()]
-        [System.Object]
-        $Param,
+        [array]
+        $VNetMetadata,
 
-        #Template Uri
-        [Parameter()]
-        [String]
-        $TemplateUri
+        #Enable Netbond Peer - Boolean Switch
+        [switch]
+        $PeerToNetbond
 
     )
     
@@ -44,12 +43,34 @@ function New-AzureVnet {
             Get-AzContext
         }
 
+        $TemplateUri = "https://raw.githubusercontent.com/dboulet01/safespace/master/vnetarray.json"
+        $paramObj = @{vnets = $VNetMetadata}
+        $hubVnetId = "/subscriptions/779a66d5-d2b5-4c10-b8f3-1dc647a7f4a9/resourceGroups/TestHubVnet/providers/Microsoft.Network/virtualNetworks/TestHubVnet"
+
     }
     
     process {
-        $deployment = New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroup -TemplateParameterObject $Param -TemplateUri $TemplateUri -Verbose
+
+        $rgcheck = Get-AzResourceGroup -Name $ResourceGroup -ErrorAction SilentlyContinue
+        if (!$rgcheck) {
+            Write-Host "Resource Group does not exist." -ForegroundColor Red
+            Write-Host "Creating resource group..." -ForegroundColor Yellow
+            Write-Host "Please enter a location for new resource group $($ResourceGroup)." -ForegroundColor Yellow
+            New-AzResourceGroup -Name $ResourceGroup
+        }
+
+        $deployment = New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroup -TemplateParameterObject $paramObj -TemplateUri $TemplateUri -Verbose
         $obj = ConvertTo-Json $deployment | ConvertFrom-Json
         $resourceId = $obj.Outputs.resourceId.Value.Split(' ')
+
+        if ($PeerToNetbond) {
+            $paramObj = @{
+                vnetName = $VNetMetadata.name
+                remoteVnetId = $hubVnetId
+            }
+            New-Az
+        }
+    
     }
     
     end {
