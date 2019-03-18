@@ -25,24 +25,6 @@ function New-AzureVnet {
     begin {
 
         Write-Host ""
-        Write-Host "Checking if Az module is installed." -ForegroundColor Yellow
-
-        # Check to see if Az module is installed and available
-        $module = Get-Module Az* -ListAvailable
-
-        if(!$module){
-            Write-Host ""
-            Write-Host "Az module not found.. Installing Az module." -ForegroundColor Yellow
-
-            # Install module using PowerShellGet if not found
-            Install-Module Az -AllowClobber -Force
-        } 
-        else {
-            Write-Host ""
-            Write-Host "Az module found." -ForegroundColor Green
-        }
-
-        Write-Host ""
         Write-Host "Setting Azure context." -ForegroundColor Yellow
 
         if($Subscription){
