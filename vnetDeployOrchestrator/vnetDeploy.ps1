@@ -25,24 +25,6 @@ function New-AzureVnet {
     begin {
 
         Write-Host ""
-        Write-Host "Checking if Az module is installed." -ForegroundColor Yellow
-
-        # Check to see if Az module is installed and available
-        $module = Get-Module Az* -ListAvailable
-
-        if(!$module){
-            Write-Host ""
-            Write-Host "Az module not found.. Installing Az module." -ForegroundColor Yellow
-
-            # Install module using PowerShellGet if not found
-            Install-Module Az -AllowClobber -Force
-        } 
-        else {
-            Write-Host ""
-            Write-Host "Az module found." -ForegroundColor Green
-        }
-
-        Write-Host ""
         Write-Host "Setting Azure context." -ForegroundColor Yellow
 
         if($Subscription){
@@ -86,22 +68,27 @@ function New-AzureVnet {
             New-AzResourceGroup -Name $ResourceGroup
         }
 
-        # Vnet deployment
-        $deployment = New-AzResourceGroupDeployment `
-        -ResourceGroupName $ResourceGroup `
-        -TemplateParameterObject $vnetParamObj `
-        -TemplateUri $VnetTemplateUri `
-        -Verbose
-
-        # Getting resource Id of Vnet for use in peering
-        $newVnet = Get-AzVirtualNetwork `
-        -ResourceGroupName $ResourceGroup `
-        -Name $VNetMetadata.name
-
-        $resourceId = $newVnet.Id
+        if (!$VNetMetaData.AddressPrefixes -and !$VnetMetaData.Subnets) {
+            #skip to peering
+        } 
+        else {
+            # Vnet deployment
+            $deployment = New-AzResourceGroupDeployment `
+            -ResourceGroupName $ResourceGroup `
+            -TemplateParameterObject $vnetParamObj `
+            -TemplateUri $VnetTemplateUri `
+            -Verbose
+        }
 
         # If PeerToHub is set to True
         if ($PeerToHub) {
+            # Getting resource Id of Vnet for use in peering
+            $newVnet = Get-AzVirtualNetwork `
+            -ResourceGroupName $ResourceGroup `
+            -Name $VNetMetadata.name
+
+            $resourceId = $newVnet.Id
+
             # Spoke peer deployment parameters
             $spokeParamObj = @{
                 vnetName = $VNetMetadata.name
@@ -149,14 +136,24 @@ function New-AzureVnet {
     }
     
     end {
-        if ($PeerToHub) {
+        if ($VNetMetaData.AddressPrefixes -and $VnetMetaData.Subnets -and $PeerToHub) {
             Write-Host ""
-            Write-Host "VNet has been created and peered to Hub." -ForegroundColor Green
+            Write-Host "$($VNetMetaData.Name) has been created and peered to $($hubVnetName)." -ForegroundColor Green
             Write-Host ""
         }
-        else{
+        elseif ($VNetMetaData.AddressPrefixes -and $VnetMetaData.Subnets -and !$PeerToHub) {
             Write-Host ""
-            Write-Host "Vnet has been created." -ForegroundColor Green
+            Write-Host "$($VnetMetaData.Name) has been created." -ForegroundColor Green
+            Write-Host ""
+        }
+        elseif (!$VNetMetaData.AddressPrefixes -and !$VnetMetaData.Subnets -and $PeerToHub) {
+            Write-Host ""
+            Write-Host "$($VNetMetaData.Name) has been peered to $($hubVnetName)." -ForegroundColor Green
+            Write-Host ""
+        }
+        else {
+            Write-Host ""
+            Write-Host "Nothing occurred" -ForegroundColor Green
             Write-Host ""
         }
     }

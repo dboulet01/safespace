@@ -3,19 +3,13 @@ $arguments = @{
         @{
             name = "TestSpokeVnet"
             addressPrefixes = @(
-                "192.168.0.0/16"
+                "10.0.0.0/16"
             )
             subnets = @(
                 @{
-                    name = "firstSubnet"
+                    name = "Subnet"
                     properties = @{
-                        addressPrefix = "192.168.1.0/24"
-                    }
-                },
-                @{
-                    name = "secondSubnet"
-                    properties = @{
-                        addressPrefix = "192.168.2.0/24"
+                        addressPrefix = "10.0.1.0/24"
                     }
                 }
             )
@@ -23,7 +17,7 @@ $arguments = @{
     )
     ResourceGroup = "TestSpokeVnet"
     Subscription = ""
-    PeerToHub = $true
+    PeerToHub = $false
 }
 
 ######################################################################################################################
