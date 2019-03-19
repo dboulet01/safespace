@@ -1,44 +1,26 @@
 $arguments = @{
     VNetMetadata = @(
         @{
-            name = "TestSpokeVnet"
+            name = "VnetName"
             addressPrefixes = @(
-                "10.0.0.0/16"
+                "192.168.0.0/16"
             )
             subnets = @(
                 @{
-                    name = "Subnet"
+                    name = "SubnetName"
                     properties = @{
-                        addressPrefix = "10.0.1.0/24"
+                        addressPrefix = "192.168.1.0/24"
                     }
                 }
             )
         }
     )
-    ResourceGroup = "TestSpokeVnet"
-    Subscription = ""
+    # Resource group to deploy vnet to
+    ResourceGroup = "ResourceGroupName"
+
+    # Will accept Subscription Name or Subscription Id
+    Subscription = "SubscriptionNameorId"
+
+    # Peer to hub (True) - Standalone vnet (False)
     PeerToHub = $false
 }
-
-######################################################################################################################
-#                                             How to run vnetDeploy                                                  #
-######################################################################################################################
-#                                                                                                                    #
-#  1. Load vnetDeploy.ps1                                                                                            #
-#       - download and save ps1                                                                                      #
-#       - dot-source ps1 file                                                                                        #
-#                                                                                                                    #
-#     If in same directory as script      PS C:\Users\user\scripts>. .\vnetDeploy.ps1                                #
-#     If in different directory           PS C:\Users\user\differentdirectory>. C:\Users\user\scripts\vnetDeploy.ps1 #
-#                                                                                                                    #
-#  2. Build VnetMetaData and set additional arguments                                                                #
-#                                                                                                                    #
-#  3. Save and run metadata file to load arguments/metadata into $arguments variable                                 #
-#           - PS C:\Users\user\scripts>. .\vnetDeployMetadata.ps1                                                    #                                            
-#                                                                                                                    #
-#  4. Issue 'New-AzureVnet @arguments' to call function and splat parameters                                         #
-#                  (assumes you're logged in Azure 'Login-AzAccount')                                                #
-#                                                                                                                    #
-#  5. Popcorn                                                                                                        #
-#                                                                                                                    #
-######################################################################################################################
