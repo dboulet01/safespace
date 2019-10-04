@@ -1,0 +1,61 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName":{
+            "type": "string",
+            "metadata": {
+                "description": "Name of virtual network to deploy peer to."
+            }
+        },
+        "isHub": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Is Hub(True) or Spoke(False) - Spoke by default."
+            }
+        },
+        "remoteVnetId": {
+            "type": "string",
+            "metadata": {
+                "description": "Resource Id of remote virtual network to peer to."
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "condition": "[equals(parameters('isHub'), bool('false'))]",
+            "apiVersion": "2018-11-01",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "name": "[concat(parameters('vnetName'),'/peer-to-hub-',last(split(parameters('remoteVnetId'),'/')))]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": true,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": true,
+                "remoteVirtualNetwork": {
+                    "id": "[parameters('remoteVnetId')]"
+                }
+            }
+        },
+        {
+            "condition": "[equals(parameters('isHub'), bool('true'))]",
+            "apiVersion": "2018-11-01",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "name": "[concat(parameters('vnetName'),'/peer-to-spoke-',last(split(parameters('remoteVnetId'),'/')))]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": true,
+                "allowGatewayTransit": true,
+                "useRemoteGateways": false,
+                "remoteVirtualNetwork": {
+                    "id": "[parameters('remoteVnetId')]"
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
